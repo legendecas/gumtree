@@ -11,3 +11,8 @@ samples/
 build/
 out/
 .vagrant/
+
+benchmark/bin
+client*/bin
+core/bin
+gen.*/bin
