@@ -21,12 +21,11 @@ dependencies {
 	compile project(':gen.antlr3-php')
 	compile project(':gen.antlr3-r')
 	compile project(':gen.antlr3-xml')
-	compile project(':gen.antlr4')
-	compile project(':gen.antlr4-python3')
 	compile project(':gen.c')
 	compile project(':gen.css')
 	compile project(':gen.jdt')
 	compile project(':gen.js')
+	compile project(':gen.python3')
 	compile project(':gen.ruby')
 	compile project(':gen.srcml')
 }

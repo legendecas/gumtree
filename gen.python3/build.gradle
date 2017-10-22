@@ -1,0 +1,32 @@
+description = 'GumTree tree generator for Python 3 code.'
+
+buildscript {
+	ext.kotlin_version = '1.1.51'
+
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+	}
+}
+
+apply plugin: 'kotlin'
+
+kotlin {
+	experimental {
+		coroutines 'enable'
+	}
+}
+
+repositories {
+	jcenter()
+}
+
+dependencies {
+	compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+
+	compile 'com.beust:klaxon:0.30'
+	compile 'commons-io:commons-io:2.5'
+}
