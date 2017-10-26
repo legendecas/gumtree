@@ -1,0 +1,94 @@
+{
+  "typeLabel": "Module",
+  "type": 111516500389709,
+  "start": 0,
+  "end": 31,
+  "children": [
+    {
+      "typeLabel": "FunctionDef",
+      "type": 123788654951754037428385094,
+      "start": 0,
+      "end": 31,
+      "col_offset": 0,
+      "lineno": 1,
+      "label": "main",
+      "children": [
+        {
+          "typeLabel": "arguments",
+          "type": 2129765323153231802977,
+          "start": 9,
+          "end": 12,
+          "children": [
+            {
+              "typeLabel": "arg",
+              "type": 6779489,
+              "start": 9,
+              "end": 10,
+              "label": "b",
+              "children": [],
+              "arg": "b"
+            },
+            {
+              "typeLabel": "Num",
+              "type": 7173454,
+              "start": 11,
+              "end": 12,
+              "col_offset": 11,
+              "lineno": 1,
+              "label": "1",
+              "children": []
+            }
+          ]
+        },
+        {
+          "typeLabel": "Return",
+          "type": 121437875889490,
+          "start": 19,
+          "end": 31,
+          "col_offset": 4,
+          "lineno": 2,
+          "children": [
+            {
+              "typeLabel": "BinOp",
+              "type": 482368973122,
+              "start": 26,
+              "end": 31,
+              "col_offset": 11,
+              "lineno": 2,
+              "children": [
+                {
+                  "typeLabel": "Name",
+                  "type": 1701667150,
+                  "start": 26,
+                  "end": 27,
+                  "col_offset": 11,
+                  "lineno": 2,
+                  "label": "a",
+                  "children": []
+                },
+                {
+                  "typeLabel": "Add",
+                  "type": 6579265,
+                  "start": 0,
+                  "end": 0,
+                  "children": []
+                },
+                {
+                  "typeLabel": "Num",
+                  "type": 7173454,
+                  "start": 30,
+                  "end": 31,
+                  "col_offset": 15,
+                  "lineno": 2,
+                  "label": "1",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "name": "main"
+    }
+  ]
+}
