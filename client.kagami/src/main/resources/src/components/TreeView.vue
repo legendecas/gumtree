@@ -3,9 +3,11 @@
     <tree-view-item
       class="tree-view-item-root"
       :data="parsedData"
+      :parent="'root'"
       :max-depth="allOptions.maxDepth"
       :current-depth="0"
       :modifiable="allOptions.modifiable"
+      :type="allOptions.type"
       @change-data="onChangeData"
     ></tree-view-item>
   </div>
@@ -34,17 +36,20 @@
       // both Objects and Arrays, returning either the Key as
       // a string or the Index as an integer
       generateChildrenFromCollection: function (collection) {
-        return _.map(collection, (value, keyOrIndex) => {
-          if (this.isObject(value)) {
-            return this.transformObject(value, keyOrIndex)
-          }
-          if (this.isArray(value)) {
-            return this.transformArray(value, keyOrIndex)
-          }
-          if (this.isValue(value)) {
-            return this.transformValue(value, keyOrIndex)
-          }
-        })
+        return _.chain(collection)
+          .map((value, key) => ([value, key]))
+          .filter(([value, keyOrIdx]) => !_.startsWith(keyOrIdx, '__'))
+          .map(([value, keyOrIdx]) => {
+            if (this.isObject(value)) {
+              return this.transformObject(value, keyOrIdx)
+            }
+            if (this.isArray(value)) {
+              return this.transformArray(value, keyOrIdx)
+            }
+            if (this.isValue(value)) {
+              return this.transformValue(value, keyOrIdx)
+            }
+          }).value()
       },
       // Transformer for the Array type
       transformArray: function (arrayToTransform, keyForArray) {
@@ -56,12 +61,17 @@
       },
       // Transformer for the Object type
       transformObject: function (objectToTransform, keyForObject, isRootObject = false) {
-        return {
+        const obj = {
           key: keyForObject,
           type: 'object',
           isRoot: isRootObject,
+          idx: objectToTransform.__idx,
           children: this.generateChildrenFromCollection(objectToTransform)
         }
+        _.keys(objectToTransform).filter(it => it.startsWith('__')).forEach(key => {
+          obj[_.trimStart(key, '__')] = objectToTransform[key]
+        })
+        return obj
       },
       // Helper Methods for value type detection
       isObject: function (value) {
