@@ -1,5 +1,14 @@
 <template>
   <div class="comparison-view">
+    <div class="legend-view">
+      <div class="legend-container">
+        <div
+          v-for="lgd in ['insert', 'update', 'move', 'delete']"
+          :key="lgd"
+          :class="['legend', lgd]"
+        ><p>{{lgd}}</p></div>
+      </div>
+    </div>
     <div class="view src-view">
       <button @click="toggleView('src')">Toggle</button>
       <tree-view
@@ -35,6 +44,29 @@
 <script>
 import _ from 'lodash'
 import bus from '../eventBus'
+
+const resources = {
+  src: {
+    source: '/api/src/source',
+    tree: '/api/src/tree'
+  },
+  dest: {
+    source: '/api/dest/source',
+    tree: '/api/dest/tree'
+  },
+  match: '/api/match'
+}
+if (process.env.NODE_ENV !== 'production') {
+  resources.src = {
+    source: '/static/source.py',
+    tree: '/static/source.py.json'
+  }
+  resources.dest = {
+    source: '/static/target.py',
+    tree: '/static/target.py.json'
+  }
+  resources.match = '/static/diff.json'
+}
 
 export default {
   name: 'ComparisonView',
@@ -98,37 +130,44 @@ export default {
           idx = this.tagTree(child, idx)
         })
       }
+      if (!_.isNil(node.pos) && !_.isNil(node.length)) {
+        node.start = Number(node.pos)
+        node.end = Number(node.pos) + Number(node.length)
+      }
       node.__idx = idx
       return idx + 1
     },
     tagSourceActions (tree, actions) {
       _.forEach(actions, it => {
         const node = this.findNode(it.tree, tree)
+        if (_.isNil(node)) {
+          return
+        }
         switch (it.action) {
           case 'update':
-            node.__action = 'update'
-            break
           case 'delete':
-            node.__action = 'delete'
-            break
           case 'move':
-            node.__action = 'move'
+            node.__action = it.action
             break
         }
       })
     },
     tagTargetActions (tree, actions) {
       _.forEach(actions, it => {
+        let node
         switch (it.action) {
           case 'insert':
-            this.findNode(it.tree, tree).__action = 'insert'
+            node = this.findNode(it.tree, tree)
             break
           case 'update':
-            this.findNode(this.findMatchIdx(it.tree), tree).__action = 'update'
+            node = this.findNode(this.findMatchIdx(it.tree), tree)
             break
           case 'move':
-            this.findNode(this.findMatchIdx(it.tree), tree).__action = 'move'
+            node = this.findNode(this.findMatchIdx(it.tree), tree)
             break
+        }
+        if (node) {
+          node.__action = it.action
         }
       })
     },
@@ -173,7 +212,11 @@ export default {
       if (response.status !== 200) {
         throw new Error('fetch source failed')
       }
-      const sourceTree = await response.json()
+      let sourceTree = await response.json()
+      if (sourceTree.root && _.isNil(sourceTree.children)) {
+        sourceTree = sourceTree.root
+      }
+      console.log('original', sourceTree)
       this.tagTree(sourceTree)
       return sourceTree
     },
@@ -195,15 +238,17 @@ export default {
     }
   },
   async created () {
-    const match = await this.fetchMatch('/static/diff.json')
+    const match = await this.fetchMatch(resources.match)
+    console.log(_.cloneDeep(match))
     this.match = match
-    const [srcTree, destTree] = await Promise.all([this.fetchJson('/static/source.py.json'), this.fetchJson('/static/target.py.json')])
+    const [srcTree, destTree] = await Promise.all([this.fetchJson(resources.src.tree), this.fetchJson(resources.dest.tree)])
+    console.log('src', _.cloneDeep(srcTree), 'dest', _.cloneDeep(destTree))
     this.srcTree = srcTree
     this.destTree = destTree
     this.tagSourceActions(this.srcTree, this.match.actions)
     this.tagTargetActions(this.destTree, this.match.actions)
 
-    const [srcSource, destSource] = await Promise.all([this.fetchSource('/static/source.py'), this.fetchSource('/static/target.py')])
+    const [srcSource, destSource] = await Promise.all([this.fetchSource(resources.src.source), this.fetchSource(resources.dest.source)])
     this.srcSource = srcSource
     this.destSource = destSource
 
@@ -237,10 +282,48 @@ a {
 
 .comparison-view {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .view {
   text-align: left;
   flex: 1;
+}
+
+.legend-view {
+  padding-right: 8px;
+  width: 100%;
+}
+
+.legend-container {
+  display: flex;
+  flex-direction: row-reverse;
+  height: 2em;
+}
+
+.legend-view .legend {
+  padding: -2 2px;
+  margin: 2px;
+  width: 4em;
+}
+
+.legend p {
+  margin: 2px 0;
+}
+
+.legend-view .insert {
+  background-color: #26A69A;
+}
+
+.legend-view .update {
+  background-color: #FFCA28;
+}
+
+.legend-view .delete {
+  background-color: #FF7043;
+}
+
+.legend-view .move {
+  background-color: #29B6F6;
 }
 </style>

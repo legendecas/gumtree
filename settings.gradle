@@ -1,6 +1,7 @@
 include 'benchmark',
         'client',
         'client.diff',
+        'client.kagami',
         'core',
         'dist',
         'gen.antlr3',

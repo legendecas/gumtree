@@ -22,12 +22,6 @@ export default class StringReplacer {
           break
       }
     })
-    console.log('action:', {
-      start,
-      length,
-      padding: padStart.length,
-      offset: padStart.length + padEnd.length
-    })
     this.actions.push({
       start,
       length,
@@ -37,8 +31,6 @@ export default class StringReplacer {
 
     const temp = [...this.result]
     const wrap = temp.slice(newStart, newStart + newLength).join('')
-    const origWrap = [...this.orig].slice(start, start + length).join('')
-    console.log(origWrap + '\n->\n' + wrap, '\npad: ' + padStart, length, newLength, start, newStart)
     temp.splice(newStart, newLength, ...padStart, ...wrap, ...padEnd)
     this.result = temp.join('')
   }
