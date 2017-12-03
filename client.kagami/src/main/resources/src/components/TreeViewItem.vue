@@ -4,6 +4,7 @@
       <div class="tree-view-item-node" @click.stop="toggleOpen()" >
         <span :class="{opened: isOpen()}" class="tree-view-item-key tree-view-item-key-with-chevron">{{getKey(data)}}</span>
         <span class="tree-view-item-hint">({{data.idx}})</span>
+        <span class="tree-view-item-hint" v-if="data.actions">({{data.actions.join(',')}})</span>
         <span class="tree-view-item-hint" v-show="!isOpen() && data.children.length === 1">{{data.children.length}} property</span>
         <span class="tree-view-item-hint" v-show="!isOpen() && data.children.length !== 1">{{data.children.length}} properties</span>
       </div>

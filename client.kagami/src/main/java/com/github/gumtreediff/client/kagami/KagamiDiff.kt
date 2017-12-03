@@ -8,15 +8,14 @@ import com.github.gumtreediff.gen.Registry
 import com.github.gumtreediff.io.ActionsIoUtils
 import com.github.gumtreediff.io.TreeIoUtils
 import org.apache.commons.io.IOUtils
-import spark.Spark.get
-import spark.Spark.staticFileLocation
+import spark.Spark.*
 import java.io.FileReader
 
 @Suppress("unused")
 @Register(name = "Kagami", description = "An elegant web diff client", options = KagamiDiff.Options::class, priority = Registry.Priority.HIGH)
 class KagamiDiff(args: Array<out String>?) : AbstractDiffClient<KagamiDiff.Options>(args) {
     class Options : AbstractDiffClient.Options() {
-        private var defaultPort = Integer.parseInt(System.getProperty("gumtree.client.web.port", "4567"))
+        var defaultPort = Integer.parseInt(System.getProperty("gumtree.client.kagami.port", "4567"))
         var stdin = true
 
         override fun values(): Array<Option> =
@@ -35,11 +34,13 @@ class KagamiDiff(args: Array<out String>?) : AbstractDiffClient<KagamiDiff.Optio
 
     override fun run() {
         configureSpark()
+        print("Server started at http://0.0.0.0:${opts.defaultPort}.")
     }
 
     override fun newOptions() = Options()
 
     private fun configureSpark() {
+        port(opts.defaultPort)
         staticFileLocation("/dist")
         get("/api/:type/source") { req, res ->
             res.header("Access-Control-Allow-Origin", "*")

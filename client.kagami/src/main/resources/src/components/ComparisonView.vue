@@ -148,6 +148,7 @@ export default {
           case 'delete':
           case 'move':
             node.__action = it.action
+            node.__actions ? node.__actions.push(it.action) : node.__actions = [it.action]
             break
         }
       })
@@ -168,6 +169,7 @@ export default {
         }
         if (node) {
           node.__action = it.action
+          node.__actions ? node.__actions.push(it.action) : node.__actions = [it.action]
         }
       })
     },

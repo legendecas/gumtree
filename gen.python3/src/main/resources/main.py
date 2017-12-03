@@ -15,7 +15,10 @@ LITERALS = [
 ]
 LABEL = {
     ast.FunctionDef: 'name',
+    ast.ClassDef: 'name',
     ast.arg: 'arg',
+    ast.alias: ['asname', 'label', 'name'],
+    ast.Name: 'label',
 }
 
 
@@ -38,7 +41,16 @@ def astTraverser(atok, node, d=None):
         d['children'] = list()
         return d
     if node.__class__ in LABEL:
-        d['label'] = getattr(node, LABEL[node.__class__])
+        labels = LABEL[node.__class__]
+        if type(LABEL[node.__class__]) is not list:
+            labels = [labels]
+        while d.get('label') is None and len(labels) > 0:
+            try:
+                d['label'] = getattr(node, labels.pop(0))
+            except AttributeError:
+                pass
+            except IndexError:
+                pass
     d['children'] = list()
     for field in node._fields:
         value = getattr(node, field)
