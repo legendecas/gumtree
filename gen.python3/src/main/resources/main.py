@@ -3,6 +3,7 @@ import json
 import asttokens
 import sys
 import os
+import hashlib
 from pathlib import Path
 from argparse import ArgumentParser
 from itertools import repeat
@@ -23,7 +24,19 @@ LABEL = {
 
 
 def convertToNumber(s):
-    return int.from_bytes(s.encode(), 'little')
+    h = hashlib.md5(s.encode())
+    digest = h.hexdigest()
+    return int(digest, 16)
+    # return int.from_bytes(s.encode(), 'little')
+
+
+def constructVirtualNode(atok, field, children):
+    d = dict()
+    d['typeLabel'] = field
+    d['type'] = convertToNumber(field)
+    d['start'], d['end'] = (0, 0)
+    d['children'] = [astTraverser(atok, it) for it in children]
+    return d
 
 
 def astTraverser(atok, node, d=None):
@@ -58,8 +71,8 @@ def astTraverser(atok, node, d=None):
             continue
         if isinstance(value, ast.AST):
             d['children'].append(astTraverser(atok, value))
-        elif isinstance(value, list):
-            d['children'] += [astTraverser(atok, it) for it in value]
+        elif isinstance(value, list) and len(value) > 0:
+            d['children'].append(constructVirtualNode(atok, field, value))
         else:
             d[field] = value
     return d
